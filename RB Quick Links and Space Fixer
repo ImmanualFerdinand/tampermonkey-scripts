@@ -1,0 +1,150 @@
+// ==UserScript==
+// @name         RockerBox UI Spacing Fixer
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  try to take over the world!
+// @author       @lfferdi
+// @match       https://rockerbox.kpex.catalog.a2z.com/*
+// @match       https://rockerbox-beta.kpex.catalog.a2z.com/*
+// @icon        https://www.google.com/s2/favicons?sz=64&domain=a2z.com
+// @require      http://code.jquery.com/jquery-3.3.1.min.js
+// @require      https://gist.github.com/raw/2625891/waitForKeyElements.js
+// @grant        GM_addStyle
+// @run-at       document-end
+// ==/UserScript==
+
+$.noConflict();
+jQuery( document ).ready(function( $ ) {
+
+
+
+    //logs display
+    var logs = "waiting..."
+    $("body").prepend('<a style="margin:1px;font-size:18px;color:black;" class="UI_fixer dispLogs">' + logs + '</a>');
+
+    //Wait for initial page load
+    setTimeout(function(){
+
+        console.log("checking...");
+        logs = "checking...";
+        displayLogs();
+
+        //Selecting the Filter button
+        var element = $("div.awsui-util-action-stripe-group div.awsui-button-dropdown-container awsui-button button");
+
+        //check if page is fully enabled through class removal of "Filter" button
+        var int = setInterval(function checkEl() {
+
+            if (element.hasClass('awsui-button-disabled')) {
+                console.log("page still not ready...");
+                logs = "page still not ready...";
+                displayLogs()
+
+            } else {
+                console.log("page ready!");
+                logs = "page ready!";
+                displayLogs();
+                clearInterval(int);
+
+
+                //add start button to initiate script
+                //fix page to avoid scrolling
+
+                let RBtitle = $(".col-9").text();
+
+                let title = RBtitle.split("-",100);
+                let pt =title[2];
+
+                let attribute =title[3];
+
+                //SABEX
+                if((RBtitle.toLowerCase()).includes("sabex")){
+                    RBtitle=RBtitle.split(" ",1);
+                    pt=$('.scope-value-panel').text();
+                    attribute=document.getElementsByClassName('awsui-util-pr-xl')[0].textContent.replaceAll(".value","").replaceAll(".unit","");
+                    console.log(attribute)
+
+                    //   attribute=attribute.textContent.replaceAll(".value","").replaceAll(".unit","");
+
+
+                    console.log(attribute)
+                }
+
+
+
+
+                let IMSV3attribute =attribute.split(".",100);
+                IMSV3attribute=IMSV3attribute[0];
+
+                let attG2S2 = attribute.replaceAll(".","%2C");
+
+                let ptLink ="https://catalog-admin.corp.amazon.com/productTypes/"+pt+"?namespace=contribution&target=tipVersion";
+                let attributeLink ="https://w.amazon.com/index.php/Metadata/"+IMSV3attribute;
+                let edLink ="https://enumeration-discovery.corp.amazon.com/";
+                let maxOccursLink ="https://g2s2-editor.amazon.com/editor/;jsessionid=4739D14816875B253673CEAB5772AD55#n=25&p=0&t=product_attribute_constraints&sv=%40&domain_id=10480&product_type="+pt+"&attribute_name=%5B"+attG2S2+"%5D&stage_version=%40Prod";
+                let CVVDLink = "https://share.amazon.com/sites/automated_backfill/Lists/VVD_Centralized_PGs/AllItems.aspx?View=%7b82B8F513-D9E6-4AF1-905B-808AF12340D9%7d&InitialTabId=Ribbon%2ERead&VisibilityContext=WSSTabPersistence#InplviewHash82b8f513-d9e6-4af1-905b-808af12340d9=";
+                let googleQ="https://www.google.com/search?q=What does "+(attribute.replaceAll("."," ").replaceAll("_"," "))+" mean for "+(pt.replaceAll("_"," "));
+
+
+                $(".awsui-tabs-header").append('<a style="margin:15px 1px 1px 10px; height:30px; background: black; color:white;" href="'+ptLink+'"; target="_blank"; class="btn btn-sm btn-info pt_link" id="pt_link" >PT - '+pt+'</a>');
+                $(".awsui-tabs-header").append('<a style="margin:15px 1px 1px 10px; height:30px; background: black; color:white;" href="'+attributeLink+'"; target="_blank"; class="btn btn-sm btn-info att_link"; id="att_link">ATT - '+attribute+'</a>');
+
+                $(".awsui-tabs-header").append('<a style="margin:15px 1px 1px 10px; height:30px; background: black; color:white;" href="'+maxOccursLink+'"; target="_blank"; class="btn btn-sm btn-info max_occurs_link" id="max_occurs_link" >ATT max_occurs</a>');
+                $(".awsui-tabs-header").append('<a style="margin:15px 1px 1px 10px; height:30px; background: black; color:white;" href="'+googleQ+'"; target="_blank"; class="btn btn-sm btn-info Google" id="google_link" >Google</a>');
+
+
+                $(".awsui-tabs-header").append('<a style="margin:15px 1px 1px 10px; height:30px; background: black; color:white;" href="'+edLink+'"; target="_blank"; class="btn btn-sm btn-info ED_Tool" id="ed_link" >ED Tool</a>');
+                $(".awsui-tabs-header").append('<a style="margin:15px 1px 1px 10px; height:30px; background: black; color:white;" href="'+CVVDLink+'"; target="_blank"; class="btn btn-sm btn-info cvvd_link" id="cvvd_link" >CVVD</a>');
+
+
+
+                $("body").prepend('<a style="margin:1px; margin-left:5px; background: black;" class="btn btn-sm btn-info remove_space" id="remove_space">Remove Junk UI Spaces</a>');
+
+                $('.dispLogs').remove();
+
+
+                $("#remove_space").click(function() {
+                    let temp = $(".App.container");
+                    console.log(temp);
+
+                    $('.container').attr('style','padding:1px');
+                    $(".container").attr('style','margin-right:5px');
+                    $('.container').attr('style','margin-left:5px');
+                    $('.container').attr('style','width:100%');
+
+
+
+                    $('.col-xxxs-4').attr('style','max-width:100%; flex: 0 0 18%');
+                    $('.col-xxs-8').attr('style','max-width:100%; flex: 0 0 82%');
+                    //  $('.scope-value-panel').attr('style','max-height:100px')
+                    //  $('.main-row').attr('style','width:100%')
+
+
+
+                    $("#remove_space").remove();
+
+
+                });
+
+
+
+            }
+
+        }, 500);
+
+    }, 3000);
+
+
+
+    function displayLogs(){
+        $.ajax({
+            method: 'get',
+            data: logs,
+        }).done(function() {
+            $('.dispLogs').text(logs);
+        });
+
+    }
+
+
+})();
